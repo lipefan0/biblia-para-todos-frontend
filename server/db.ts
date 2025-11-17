@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, readingProgress, subscriptions } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,100 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getReadingProgress(userId: number, page: number = 1, limit: number = 20) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const offset = (page - 1) * limit;
+  const result = await db
+    .select()
+    .from(readingProgress)
+    .where(eq(readingProgress.userId, userId))
+    .orderBy(desc(readingProgress.readAt))
+    .limit(limit)
+    .offset(offset);
+
+  return result;
+}
+
+export async function getReadingStats(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(readingProgress)
+    .where(eq(readingProgress.userId, userId));
+
+  return {
+    totalVersesRead: result.length,
+  };
+}
+
+export async function checkVerseRead(userId: number, verseId: bigint) {
+  const db = await getDb();
+  if (!db) return false;
+
+  const result = await db
+    .select()
+    .from(readingProgress)
+    .where(
+      and(
+        eq(readingProgress.userId, userId),
+        eq(readingProgress.verseId, verseId)
+      )
+    )
+    .limit(1);
+
+  return result.length > 0;
+}
+
+export async function saveReadingProgress(
+  userId: number,
+  verseId: bigint,
+  bookName: string,
+  bookAbreviation: string,
+  chapterNumber: number,
+  verseNumber: number
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(readingProgress).values({
+    userId,
+    verseId,
+    bookName,
+    bookAbreviation,
+    chapterNumber,
+    verseNumber,
+  });
+
+  return result;
+}
+
+export async function getUserSubscription(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createUserSubscription(userId: number, plan: "FREE" | "AI_PREMIUM" = "FREE") {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(subscriptions).values({
+    userId,
+    plan,
+  });
+
+  return result;
+}
+
+// TODO: add more feature queries here as your schema grows.

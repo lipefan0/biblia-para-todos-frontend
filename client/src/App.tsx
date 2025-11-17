@@ -5,12 +5,30 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import BibleReader from "./pages/BibleReader";
+import BookView from "./pages/BookView";
+import ChapterView from "./pages/ChapterView";
+import Search from "./pages/Search";
+import Dashboard from "./pages/Dashboard";
+import ReadingHistory from "./pages/ReadingHistory";
+import AIExplainer from "./pages/AIExplainer";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/register"} component={Register} />
+      <Route path={"/bible"} component={BibleReader} />
+      <Route path={"/book/:bookAbreviation"} component={BookView} />
+      <Route path={"/book/:bookAbreviation/chapter/:chapter"} component={ChapterView} />
+      <Route path={"/search"} component={Search} />
+      <Route path={"/dashboard"} component={Dashboard} />
+      <Route path={"/history"} component={ReadingHistory} />
+      <Route path={"/ai"} component={AIExplainer} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
