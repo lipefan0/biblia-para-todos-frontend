@@ -101,9 +101,7 @@ export default function Search() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-700">{verse.text}</p>
-                    <div className="mt-2 text-xs text-gray-500">
-                      {verse.testament === "AT" ? "Antigo Testamento" : "Novo Testamento"}
-                    </div>
+  
                   </CardContent>
                 </Card>
               ))}

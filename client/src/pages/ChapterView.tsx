@@ -12,6 +12,7 @@ export default function ChapterView() {
   const [chapter, setChapter] = useState<ChapterResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const bookAbreviation = params?.bookAbreviation as string;
   const chapterNumber = parseInt(params?.chapter as string, 10);
@@ -22,7 +23,7 @@ export default function ChapterView() {
 
       try {
         setLoading(true);
-        const chapterData = await apiClient.getChapter(bookAbreviation, chapterNumber);
+        const chapterData = await apiClient.getChapter(bookAbreviation, chapterNumber, currentPage);
         setChapter(chapterData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro ao carregar capítulo");
@@ -32,7 +33,7 @@ export default function ChapterView() {
     };
 
     loadChapter();
-  }, [bookAbreviation, chapterNumber]);
+  }, [bookAbreviation, chapterNumber, currentPage]);
 
   if (!match) {
     return <div>Capítulo não encontrado</div>;
@@ -66,12 +67,26 @@ export default function ChapterView() {
 
   const handlePrevChapter = () => {
     if (chapterNumber > 1) {
+      setCurrentPage(1);
       setLocation(`/book/${bookAbreviation}/chapter/${chapterNumber - 1}`);
     }
   };
 
   const handleNextChapter = () => {
+    setCurrentPage(1);
     setLocation(`/book/${bookAbreviation}/chapter/${chapterNumber + 1}`);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < chapter.totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   return (
@@ -85,14 +100,14 @@ export default function ChapterView() {
             className="mb-4"
           >
             <ChevronLeft className="h-4 w-4 mr-2" />
-            Voltar
+            Voltar para {chapter.bookName}
           </Button>
 
           <h1 className="text-3xl font-bold mb-2">
             {chapter.bookName} {chapter.chapterNumber}
           </h1>
           <p className="text-gray-600">
-            {chapter.verses.length} versículos
+            {chapter.verses.length} versículos • Página {chapter.currentPage} de {chapter.totalPages}
           </p>
         </div>
 
@@ -101,18 +116,45 @@ export default function ChapterView() {
           <CardContent className="pt-6">
             <div className="space-y-6 text-lg leading-relaxed">
               {chapter.verses.map((verse) => (
-                <div key={verse.verseNumber} className="flex gap-4">
-                  <span className="font-bold text-gray-500 flex-shrink-0 min-w-12">
+                <div key={verse.verseNumber} className="flex gap-4 group">
+                  <span className="font-bold text-blue-600 flex-shrink-0 min-w-12 text-right">
                     {verse.verseNumber}
                   </span>
-                  <p className="text-gray-800">{verse.text}</p>
+                  <p className="text-gray-800 flex-1">{verse.text}</p>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Navigation */}
+        {/* Page Navigation */}
+        {chapter.totalPages > 1 && (
+          <div className="flex justify-between items-center mb-6 p-4 bg-gray-50 rounded-lg">
+            <Button
+              variant="outline"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Página Anterior
+            </Button>
+
+            <span className="text-sm font-medium text-gray-600">
+              Página {chapter.currentPage} de {chapter.totalPages}
+            </span>
+
+            <Button
+              variant="outline"
+              onClick={handleNextPage}
+              disabled={currentPage === chapter.totalPages}
+            >
+              Próxima Página
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )}
+
+        {/* Chapter Navigation */}
         <div className="flex justify-between items-center">
           <Button
             variant="outline"
@@ -124,7 +166,7 @@ export default function ChapterView() {
           </Button>
 
           <span className="text-sm text-gray-600">
-            Página {chapter.currentPage} de {chapter.totalPages}
+            Capítulo {chapter.chapterNumber}
           </span>
 
           <Button variant="outline" onClick={handleNextChapter}>

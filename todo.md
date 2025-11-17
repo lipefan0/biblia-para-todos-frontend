@@ -48,3 +48,10 @@
 - [ ] Testar integração com backend
 - [ ] Otimizar performance de carregamento
 - [ ] Testar responsividade em diferentes dispositivos
+
+
+## Ajustes e Melhorias Identificadas
+- [x] Implementar paginação correta de versículos dentro de um capítulo
+- [x] Adicionar navegação entre páginas do capítulo (anterior/próxima página)
+- [x] Melhorar a integração do endpoint de busca com a página Search
+- [ ] Adicionar suporte para marcar versículos como lidos (com autenticação)
