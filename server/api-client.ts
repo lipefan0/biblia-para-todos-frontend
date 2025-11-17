@@ -23,20 +23,13 @@ export interface UserResponse {
 
 export interface BookResponse {
   name: string;
-  abreviation: string;
-  testament: string;
-  totalChapters: number;
+  abbreviation: string;
 }
 
 export interface BookDetailsResponse {
-  name: string;
-  abreviation: string;
-  testament: string;
-  totalChapters: number;
-  chapters: Array<{
-    chapterNumber: number;
-    totalVerses: number;
-  }>;
+  bookName: string;
+  bookAbbreviation: string;
+  chapters: number[];
 }
 
 export interface VerseResponse {
@@ -47,12 +40,10 @@ export interface VerseResponse {
 
 export interface ChapterResponse {
   bookName: string;
-  bookAbreviation: string;
+  bookAbbrevation: string;
   chapterNumber: number;
-  testament: string;
-  totalVerses: number;
-  totalPages: number;
   currentPage: number;
+  totalPages: number;
   verses: VerseResponse[];
 }
 

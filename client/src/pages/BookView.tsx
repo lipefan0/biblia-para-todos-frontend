@@ -79,24 +79,23 @@ export default function BookView() {
 
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
             <BookOpen className="h-8 w-8" />
-            {book.name}
+            {book.bookName}
           </h1>
           <p className="text-gray-600">
-            {book.testament === "AT" ? "Antigo Testamento" : "Novo Testamento"} • {book.totalChapters} capítulos
+            {book.chapters.length} capítulos
           </p>
         </div>
 
         {/* Chapters Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-          {book.chapters.map((chapter) => (
+          {book.chapters.map((chapterNumber) => (
             <Button
-              key={chapter.chapterNumber}
+              key={chapterNumber}
               variant="outline"
-              onClick={() => setLocation(`/book/${bookAbreviation}/chapter/${chapter.chapterNumber}`)}
+              onClick={() => setLocation(`/book/${bookAbreviation}/chapter/${chapterNumber}`)}
               className="h-auto py-4 flex flex-col items-center gap-1"
             >
-              <span className="font-bold text-lg">{chapter.chapterNumber}</span>
-              <span className="text-xs text-gray-600">{chapter.totalVerses} v.</span>
+              <span className="font-bold text-lg">{chapterNumber}</span>
             </Button>
           ))}
         </div>

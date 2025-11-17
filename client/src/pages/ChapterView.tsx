@@ -92,7 +92,7 @@ export default function ChapterView() {
             {chapter.bookName} {chapter.chapterNumber}
           </h1>
           <p className="text-gray-600">
-            {chapter.testament === "AT" ? "Antigo Testamento" : "Novo Testamento"} • {chapter.totalVerses} versículos
+            {chapter.verses.length} versículos
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export default function ChapterView() {
           <CardContent className="pt-6">
             <div className="space-y-6 text-lg leading-relaxed">
               {chapter.verses.map((verse) => (
-                <div key={verse.id} className="flex gap-4">
+                <div key={verse.verseNumber} className="flex gap-4">
                   <span className="font-bold text-gray-500 flex-shrink-0 min-w-12">
                     {verse.verseNumber}
                   </span>

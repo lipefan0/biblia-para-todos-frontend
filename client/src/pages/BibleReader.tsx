@@ -35,7 +35,7 @@ export default function BibleReader() {
   useEffect(() => {
     const filtered = books.filter((book) =>
       book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.abreviation.toLowerCase().includes(searchTerm.toLowerCase())
+      book.abbreviation.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredBooks(filtered);
   }, [searchTerm, books]);
@@ -140,22 +140,17 @@ export default function BibleReader() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredBooks.map((book) => (
             <Card
-              key={book.abreviation}
+              key={book.abbreviation}
               className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setLocation(`/book/${book.abreviation}`)}
+              onClick={() => setLocation(`/book/${book.abbreviation}`)}
             >
               <CardHeader>
                 <CardTitle className="text-lg">{book.name}</CardTitle>
-                <CardDescription>{book.abreviation}</CardDescription>
+                <CardDescription>{book.abbreviation}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="font-medium">Testamento:</span> {book.testament === "AT" ? "Antigo" : "Novo"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Capítulos:</span> {book.totalChapters}
-                  </p>
+                  <p className="text-gray-600">Clique para ver os capítulos</p>
                 </div>
               </CardContent>
             </Card>
