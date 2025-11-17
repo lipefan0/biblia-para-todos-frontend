@@ -62,13 +62,15 @@ export default function AIExplainer() {
           setError("Por favor, preencha o livro e o capítulo");
           return;
         }
-        result = await apiClient.getChapterExplanation(bookAbreviation, parseInt(chapter));
+        const res = await apiClient.summarizeChapter(bookAbreviation, parseInt(chapter));
+        result = { explanation: res.summary, references: [] };
       } else {
         if (!verseId) {
           setError("Por favor, preencha o ID do versículo");
           return;
         }
-        result = await apiClient.getVerseExplanation(parseInt(verseId));
+        const res = await apiClient.explainVerse(bookAbreviation, parseInt(chapter), parseInt(verseId));
+        result = { explanation: res.explanation, references: [] };
       }
 
       setExplanation(result);

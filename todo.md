@@ -55,3 +55,9 @@
 - [x] Adicionar navegação entre páginas do capítulo (anterior/próxima página)
 - [x] Melhorar a integração do endpoint de busca com a página Search
 - [ ] Adicionar suporte para marcar versículos como lidos (com autenticação)
+
+## Implementação de IA nos Versículos
+- [x] Adicionar hover nos versículos com botão "Explicar com IA"
+- [x] Criar modal para exibir explicação de versículos
+- [x] Integrar endpoints de IA (explain-verse, explain-verses, summarize-chapter)
+- [ ] Adicionar suporte para explicação de múltiplos versículos selecionados

@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, BookOpen, Zap } from "lucide-react";
 import { apiClient } from "../../../server/api-client";
+import VerseExplanationModal from "@/components/VerseExplanationModal";
 import type { ChapterResponse } from "../../../server/api-client";
 
 export default function ChapterView() {
@@ -13,9 +14,17 @@ export default function ChapterView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [hoveredVerse, setHoveredVerse] = useState<number | null>(null);
+  const [selectedVerse, setSelectedVerse] = useState<{ number: number; text: string } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const bookAbreviation = params?.bookAbreviation as string;
   const chapterNumber = parseInt(params?.chapter as string, 10);
+
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem("authToken"));
+  }, []);
 
   useEffect(() => {
     const loadChapter = async () => {
@@ -56,8 +65,8 @@ export default function ChapterView() {
           </CardHeader>
           <CardContent>
             <p className="text-red-600">{error || "Capítulo não encontrado"}</p>
-            <Button onClick={() => setLocation("/bible")} className="mt-4 w-full">
-              Voltar
+            <Button onClick={() => window.location.reload()} className="mt-4 w-full">
+              Tentar Novamente
             </Button>
           </CardContent>
         </Card>
@@ -89,6 +98,13 @@ export default function ChapterView() {
     }
   };
 
+  const handleVerseClick = (verseNumber: number, verseText: string) => {
+    if (isAuthenticated) {
+      setSelectedVerse({ number: verseNumber, text: verseText });
+      setIsModalOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-4">
@@ -116,11 +132,33 @@ export default function ChapterView() {
           <CardContent className="pt-6">
             <div className="space-y-6 text-lg leading-relaxed">
               {chapter.verses.map((verse) => (
-                <div key={verse.verseNumber} className="flex gap-4 group">
+                <div
+                  key={verse.verseNumber}
+                  className="flex gap-4 group p-3 rounded-lg transition-colors hover:bg-blue-50 cursor-pointer"
+                  onMouseEnter={() => setHoveredVerse(verse.verseNumber)}
+                  onMouseLeave={() => setHoveredVerse(null)}
+                  onClick={() => handleVerseClick(verse.verseNumber, verse.text)}
+                >
                   <span className="font-bold text-blue-600 flex-shrink-0 min-w-12 text-right">
                     {verse.verseNumber}
                   </span>
-                  <p className="text-gray-800 flex-1">{verse.text}</p>
+                  <div className="flex-1">
+                    <p className="text-gray-800">{verse.text}</p>
+                    {hoveredVerse === verse.verseNumber && isAuthenticated && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 text-purple-600 hover:text-purple-700 border-purple-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleVerseClick(verse.verseNumber, verse.text);
+                        }}
+                      >
+                        <Zap className="h-3 w-3 mr-1" />
+                        Explicar com IA
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -175,6 +213,21 @@ export default function ChapterView() {
           </Button>
         </div>
       </div>
+
+      {/* Verse Explanation Modal */}
+      {selectedVerse && (
+        <VerseExplanationModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedVerse(null);
+          }}
+          bookAbbreviation={bookAbreviation}
+          chapterNumber={chapterNumber}
+          verseNumber={selectedVerse.number}
+          verseText={selectedVerse.text}
+        />
+      )}
     </div>
   );
 }

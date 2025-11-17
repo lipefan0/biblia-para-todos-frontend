@@ -206,22 +206,26 @@ class ApiClient {
   }
 
   // AI endpoints (authenticated, AI_PREMIUM only)
-  async getChapterExplanation(bookAbreviation: string, chapter: number): Promise<AIExplanationResponse> {
-    return this.request("POST", "/bible-ai/chapter-summary", {
-      bookAbreviation,
-      chapter,
+  async summarizeChapter(bookAbbreviation: string, chapterNumber: number): Promise<{ summary: string }> {
+    return this.request("POST", "/bible-ai/summarize-chapter", {
+      bookAbbreviation,
+      chapterNumber,
     });
   }
 
-  async getVerseExplanation(verseId: number): Promise<AIExplanationResponse> {
-    return this.request("POST", "/bible-ai/verse-explanation", {
-      verseId,
+  async explainVerse(bookAbbreviation: string, chapterNumber: number, verseNumber: number): Promise<{ explanation: string }> {
+    return this.request("POST", "/bible-ai/explain-verse", {
+      bookAbbreviation,
+      chapterNumber,
+      verseNumber,
     });
   }
 
-  async getMultipleVersesAnalysis(verseIds: number[]): Promise<AIExplanationResponse> {
-    return this.request("POST", "/bible-ai/verses-analysis", {
-      verseIds,
+  async explainVerses(bookAbbreviation: string, chapterNumber: number, verseNumbers: number[]): Promise<{ explanation: string }> {
+    return this.request("POST", "/bible-ai/explain-verses", {
+      bookAbbreviation,
+      chapterNumber,
+      verseNumbers,
     });
   }
 }

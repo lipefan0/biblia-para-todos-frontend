@@ -6,7 +6,6 @@ import { apiClient } from "./api-client";
 import { z } from "zod";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -20,59 +19,53 @@ export const appRouter = router({
   }),
 
   bible: router({
-    books: publicProcedure.query(async () => {
+    getBooks: publicProcedure.query(async () => {
       return apiClient.getBooks();
     }),
 
-    bookDetails: publicProcedure
+    getBookDetails: publicProcedure
       .input(z.object({ bookAbreviation: z.string() }))
       .query(async ({ input }) => {
         return apiClient.getBookDetails(input.bookAbreviation);
       }),
 
-    chapter: publicProcedure
+    getChapter: publicProcedure
       .input(z.object({ bookAbreviation: z.string(), chapter: z.number(), page: z.number().optional() }))
       .query(async ({ input }) => {
-        return apiClient.getChapter(input.bookAbreviation, input.chapter, input.page);
+        return apiClient.getChapter(input.bookAbreviation, input.chapter, input.page || 1);
       }),
 
-    search: publicProcedure
+    searchVerses: publicProcedure
       .input(z.object({ keyword: z.string(), page: z.number().optional() }))
       .query(async ({ input }) => {
-        return apiClient.searchVerses(input.keyword, input.page);
+        return apiClient.searchVerses(input.keyword, input.page || 1);
       }),
   }),
 
   readingProgress: router({
-    save: protectedProcedure
+    saveProgress: protectedProcedure
       .input(z.object({ verseId: z.number() }))
       .mutation(async ({ input }) => {
         return apiClient.saveReadingProgress(input.verseId);
       }),
 
-    history: protectedProcedure
+    getHistory: protectedProcedure
       .input(z.object({ page: z.number().optional() }))
       .query(async ({ input }) => {
-        return apiClient.getReadingHistory(input.page);
+        return apiClient.getReadingHistory(input.page || 1);
       }),
 
-    recent: protectedProcedure
-      .input(z.object({ limit: z.number().optional() }))
-      .query(async ({ input }) => {
-        return apiClient.getRecentReadings(input.limit);
-      }),
-
-    stats: protectedProcedure.query(async () => {
+    getStats: protectedProcedure.query(async () => {
       return apiClient.getReadingStats();
     }),
 
-    check: protectedProcedure
+    checkVerseRead: protectedProcedure
       .input(z.object({ verseId: z.number() }))
       .query(async ({ input }) => {
         return apiClient.checkVerseRead(input.verseId);
       }),
 
-    delete: protectedProcedure
+    deleteProgress: protectedProcedure
       .input(z.object({ progressId: z.string() }))
       .mutation(async ({ input }) => {
         return apiClient.deleteReadingProgress(input.progressId);
@@ -80,11 +73,11 @@ export const appRouter = router({
   }),
 
   subscription: router({
-    get: protectedProcedure.query(async () => {
+    getSubscription: protectedProcedure.query(async () => {
       return apiClient.getSubscription();
     }),
 
-    upgrade: protectedProcedure
+    upgradeSubscription: protectedProcedure
       .input(z.object({ plan: z.enum(["AI_PREMIUM"]) }))
       .mutation(async ({ input }) => {
         return apiClient.upgradeSubscription(input.plan);
@@ -92,22 +85,22 @@ export const appRouter = router({
   }),
 
   ai: router({
-    chapterExplanation: protectedProcedure
-      .input(z.object({ bookAbreviation: z.string(), chapter: z.number() }))
+    summarizeChapter: protectedProcedure
+      .input(z.object({ bookAbbreviation: z.string(), chapterNumber: z.number() }))
       .mutation(async ({ input }) => {
-        return apiClient.getChapterExplanation(input.bookAbreviation, input.chapter);
+        return apiClient.summarizeChapter(input.bookAbbreviation, input.chapterNumber);
       }),
 
-    verseExplanation: protectedProcedure
-      .input(z.object({ verseId: z.number() }))
+    explainVerse: protectedProcedure
+      .input(z.object({ bookAbbreviation: z.string(), chapterNumber: z.number(), verseNumber: z.number() }))
       .mutation(async ({ input }) => {
-        return apiClient.getVerseExplanation(input.verseId);
+        return apiClient.explainVerse(input.bookAbbreviation, input.chapterNumber, input.verseNumber);
       }),
 
-    multipleVersesAnalysis: protectedProcedure
-      .input(z.object({ verseIds: z.array(z.number()) }))
+    explainVerses: protectedProcedure
+      .input(z.object({ bookAbbreviation: z.string(), chapterNumber: z.number(), verseNumbers: z.array(z.number()) }))
       .mutation(async ({ input }) => {
-        return apiClient.getMultipleVersesAnalysis(input.verseIds);
+        return apiClient.explainVerses(input.bookAbbreviation, input.chapterNumber, input.verseNumbers);
       }),
   })
 });
